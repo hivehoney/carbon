@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.carbon.emissions.repository.CarbonRepository">
+    <select id="selectGasEmission" parameterType="String" resultType="com.carbon.emissions.domain.GasEmissionScrap">
+        select * from gas_emission where yy = #{year};
+    </select>
+
+    <select id="selectCorpEmission" parameterType="String" resultType="com.carbon.emissions.domain.EnergyConsumption">
+        SELECT *
+        FROM ENERGY_CONSUMPTION
+        WHERE yy = #{year}
+        ORDER BY CAST(REPLACE(ghg_ems, ',', '') AS BIGINT) DESC
+            LIMIT 100;
+    </select>
+
+   <select id="selectCorpDsgnStatistics" parameterType="String" resultType="com.carbon.emissions.domain.EnergyConsumption">
+       SELECT yy, dsgn_inds, SUM(CAST(REPLACE(ghg_ems, ',', '') AS BIGINT)) AS ghg_ems
+       FROM ENERGY_CONSUMPTION
+       GROUP BY yy, dsgn_inds
+           LIMIT 10
+    </select>
+
+    <select id="selectGgStatistics" parameterType="String" resultType="com.carbon.emissions.domain.GasEmissionScrap">
+        SELECT yy, sign_nm, SUM(gas_enisn_amnt) AS gas_enisn_amnt, SUM(gas_reduct_amnt) AS gas_reduct_amnt
+        FROM GAS_EMISSION
+        GROUP BY yy, sign_nm LIMIT 20
+    </select>
+
+    <select id="findById" resultType="ProductVo">
+        select * from TB_PRO
+            DUCT where id = #{id};
+    </select>
+
+    <insert id="upsertGasEmission" parameterType="list">
+        MERGE INTO gas_emission AS target
+        USING (
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.yy}, #{item.signNm}, #{item.gasEnisnAmnt}, #{item.gasReductAmnt}
+            , #{item.crbnReductAmnt}, #{item.reductBizReductAmnt}, #{item.gasReductRt}, #{item.stdEmisnAmnt})
+        </foreach>
+        ) AS source (yy, sign_nm, gas_enisn_amnt, gas_reduct_amnt
+            , crbn_reduct_amnt, reduct_biz_reduct_amnt, gas_reduct_rt, std_emisn_amnt)
+        ON (target.yy = source.yy AND target.sign_nm = source.sign_nm)
+        WHEN MATCHED THEN
+        UPDATE SET
+            gas_enisn_amnt = source.gas_enisn_amnt,
+            gas_reduct_amnt = source.gas_reduct_amnt,
+            crbn_reduct_amnt = source.crbn_reduct_amnt,
+            reduct_biz_reduct_amnt = source.reduct_biz_reduct_amnt,
+            gas_reduct_rt = source.gas_reduct_rt,
+            std_emisn_amnt = source.std_emisn_amnt
+        WHEN NOT MATCHED THEN
+        INSERT (yy, sign_nm, gas_enisn_amnt, gas_reduct_amnt
+                , crbn_reduct_amnt, reduct_biz_reduct_amnt, gas_reduct_rt, std_emisn_amnt)
+        VALUES (source.yy, source.sign_nm, source.gas_enisn_amnt, source.gas_reduct_amnt
+                , source.crbn_reduct_amnt, source.reduct_biz_reduct_amnt, source.gas_reduct_rt, source.std_emisn_amnt);
+    </insert>
+
+    <insert id="upsertCorpEmission" parameterType="list">
+        MERGE INTO ENERGY_CONSUMPTION AS target
+        USING (
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.yy}, #{item.corpNm}, #{item.adres}, #{item.dsgnInds}, #{item.tst}, #{item.vrfctAgncy},
+            #{item.engCnsm}, #{item.engUnit}, #{item.ghgEms}, #{item.ghgUnit}, #{item.dprtmChrg}, #{item.dsgnClsf})
+        </foreach>
+        ) AS source (yy, corp_nm, adres, dsgn_inds, tst, vrfct_agncy, eng_cnsm, eng_unit, ghg_ems, ghg_unit, dprtm_chrg, dsgn_clsf)
+        ON (target.yy = source.yy AND target.corp_nm = source.corp_nm)
+        WHEN MATCHED THEN
+        UPDATE SET
+            adres = source.adres,
+            dsgn_inds = source.dsgn_inds,
+            tst = source.tst,
+            vrfct_agncy = source.vrfct_agncy,
+            eng_cnsm = source.eng_cnsm,
+            eng_unit = source.eng_unit,
+            ghg_ems = source.ghg_ems,
+            ghg_unit = source.ghg_unit,
+            dprtm_chrg = source.dprtm_chrg,
+            dsgn_clsf = source.dsgn_clsf
+        WHEN NOT MATCHED THEN
+        INSERT (yy, corp_nm, adres, dsgn_inds, tst, vrfct_agncy,
+            eng_cnsm, eng_unit, ghg_ems, ghg_unit, dprtm_chrg, dsgn_clsf)
+        VALUES (source.yy, source.corp_nm, source.adres, source.dsgn_inds, source.tst, source.vrfct_agncy,
+            source.eng_cnsm, source.eng_unit, source.ghg_ems, source.ghg_unit, source.dprtm_chrg, source.dsgn_clsf);
+    </insert>
+    <!--
+        <insert id="save" parameterType="ProductVo">
+            INSERT INTO TB_PRODUCT (
+                name,
+                description,
+                status,
+            )
+            VALUES (
+                       #{name},
+                       #{description},
+                       #{status},
+                   )
+        </insert>
+
+       &lt;!&ndash; <update id="update" parameterType="io.home.test.app.product.domain.Product">
+            UPDATE
+            TB_PRODUCT
+            SET
+            <if test="name!=null">name=#{name}</if>
+            <if test="description!=null">,description=#{description}</if>
+            <if test="price!=null">,price=#{price}</if>
+            <if test="recordState!=null">,record_state=#{recordState}</if>
+            <if test="status!=null">,status=#{status}</if>
+            <if test="createdDate!=null">,created_date=#{createdDate}</if>
+            <if test="updatedDate!=null">,updated_date=#{updatedDate}</if>
+            WHERE
+            id=#{id};
+        </update>&ndash;&gt;
+
+        <delete id="deleteById">
+            delete from TB_PRODUCT where id = #{id};
+        </delete>-->
+</mapper>
