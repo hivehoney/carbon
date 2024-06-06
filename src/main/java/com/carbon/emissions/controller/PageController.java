@@ -21,13 +21,13 @@ public class PageController {
 
     @GetMapping("/carbon/emission/gg")
     public String getGasEmissionsGG(Model model) {
-        model.addAttribute("title", "경기도 온실가스 배출량");
+        model.addAttribute("title", "경기도 온실가스 배출 세부내용");
         return "carbonEmission";
     }
 
     @GetMapping("/carbon/emission/corp")
     public String getGasEmissionsCorp(Model model) {
-        model.addAttribute("title", "사업장 온실가스 배출량");
+        model.addAttribute("title", "사업장 온실가스 배출 세부내용");
         return "corpEmission";
     }
 

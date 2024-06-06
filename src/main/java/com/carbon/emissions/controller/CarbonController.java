@@ -45,7 +45,10 @@ public class CarbonController {
     @ResponseBody
     @GetMapping(value = "/corp/list")
     public Map<String, Object> corpEmissionList(@RequestParam(name = "year") String year) throws Exception {
-        List<EnergyConsumption> corpEmissionList = carbonService.selectCorpEmission(year);
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("year", year);
+
+        List<EnergyConsumption> corpEmissionList = carbonService.selectCorpEmission(params);
         Map<String, Object> map = new HashMap<>();
         map.put("corpEmissionList", corpEmissionList);
         return map;
@@ -81,10 +84,34 @@ public class CarbonController {
 
     @ResponseBody
     @GetMapping(value = "/corp/dashboard")
-    public Map<String, Object> carbonCorpDashboard(@RequestParam(name = "year") String year) throws Exception {
-        List<EnergyConsumption> corpDsgnStatistics = carbonService.selectCorpDsgnStatistics(year);
+    public Map<String, Object> carbonCorpDashboard(@RequestParam(name = "year") String year,
+                                                   @RequestParam(name = "adres") String adres) throws Exception {
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("adres", adres);
+        params.put("year", year);
+
+        List<EnergyConsumption> corpEmissionList = carbonService.selectCorpEmission(params);
+
         Map<String, Object> map = new HashMap<>();
-        map.put("corpDsgnStatistics", corpDsgnStatistics);
+        map.put("corpEmissionList", corpEmissionList);
+        return map;
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/corp/statistics")
+    public Map<String, Object> carbonCorpStatistics(@RequestParam(name = "year") String year,
+                                                   @RequestParam(name = "dsgnInds") String dsgnInds) throws Exception {
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("year", year);
+        params.put("dsgnInds", dsgnInds);
+
+        List<EnergyConsumption> corpEmissionList = carbonService.selectCorpEmission(params);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("corpEmissionList", corpEmissionList);
+
         return map;
     }
 

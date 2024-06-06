@@ -31,7 +31,7 @@
         <div th:replace="sidebar :: sidebar"></div>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">경기도 온실가스 배출량</h1>
+                <h1 class="h2">사업장별 온실가스 배출량</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="syncData()">데이터 연동</button>
@@ -42,9 +42,10 @@
                             <span id="selected-year"></span>
                         </button>
                         <ul class="dropdown-menu" id="year-dropdown" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item" href="#" onclick="selectYear(2022)">2022</a></li>
                             <li><a class="dropdown-item" href="#" onclick="selectYear(2021)">2021</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="selectYear(2020)">2020</a></li>
                             <li><a class="dropdown-item" href="#" onclick="selectYear(2019)">2019</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="selectYear(2018)">2018</a></li>
                         </ul>
                     </div>
                 </div>
@@ -57,11 +58,10 @@
                     <tr>
                         <th scope="col">년도</th>
                         <th scope="col">법인명</th>
+                        <th scope="col">업종</th>
                         <th scope="col">검증기관</th>
-                        <th scope="col">에너지 사용량</th>
-                        <th scope="col">에너지 사용량 단위</th>
                         <th scope="col">온실가스 배출량</th>
-                        <th scope="col">온실가스 배출량 단위</th>
+                        <th scope="col">주소</th>
                     </tr>
                     </thead>
                     <tbody id="table-body">
@@ -146,11 +146,10 @@
             row.innerHTML = `
                 <td>${item.yy}</td>
                 <td>${item.corpNm}</td>
+                <td>${item.dsgnInds}</td>
                 <td>${item.vrfctAgncy}</td>
-                <td>${item.engChsm}</td>
-                <td>${item.engUnit}</td>
                 <td>${item.ghgEms} ${item.ghgUnit}</td>
-                <td>${item.ghgUnit}</td>
+                <td>${item.adres}</td>
             `;
             tbody.appendChild(row);
         });

@@ -13,32 +13,37 @@
             display: flex;
             flex-direction: row;
             justify-content: center;
-            align-items: center;
             width: 100%;
-            height: 80vh; /* 두 개의 차트가 포함된 컨테이너의 높이 */
+            height: 50vh; /* 두 개의 차트가 포함된 컨테이너의 높이 */
         }
 
-        canvas {
-            display: block; /* 요소의 기본 여백을 제거 */
-            width: 50%; /* 차트 너비를 45%로 설정하여 두 개의 차트가 한 줄에 나란히 배치 */
-            max-width: 50%;
-            margin: 0 2.5%; /* 차트 사이의 여백을 추가 */
+        #myChart {
+            display: block;
+            width: 30%; /* myChart의 너비를 40%로 설정 */
+            max-width: 30%;
+            margin: 0 2.5%;
+        }
+
+        #barChart {
+            display: block;
+            width: 70%; /* barChart의 너비를 60%로 설정 */
+            max-width: 70%;
+            margin: 0 2.5%;
         }
     </style>
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">Company name</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">Anti GHGs</a>
 </header>
 <div class="container-fluid">
     <div class="row">
         <div th:replace="sidebar :: sidebar"></div>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Dashboard</h1>
+                <h1 class="h2">Anti GHGs</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary">데이터 연동</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary">Excel</button>
                     </div>
                     <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
@@ -51,26 +56,20 @@
                 <canvas id="myChart"></canvas>
                 <canvas id="barChart"></canvas>
             </div>
-            <h2>Dashboard Data</h2>
+            <h2>지역소재 사업장별 세부내용</h2>
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>
                     <tr>
-                        <th scope="col">Year</th>
-                        <th scope="col">Sign Name</th>
-                        <th scope="col">Gas Emission Amount</th>
-                        <th scope="col">Gas Reduction Amount</th>
-                        <th scope="col">Gas Reduction Amount</th>
+                        <th scope="col">년도</th>
+                        <th scope="col">법인명</th>
+                        <th scope="col">업종</th>
+                        <th scope="col">검증기관</th>
+                        <th scope="col">온실가스 배출량</th>
+                        <th scope="col">주소</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr th:each="gasEmission : ${gasEmissionList}">
-                        <td th:text="${gasEmission.yy}"></td>
-                        <td th:text="${gasEmission.signNm}"></td>
-                        <td th:text="${gasEmission.gasEnisnAmnt}"></td>
-                        <td th:text="${gasEmission.gasReductAmnt}"></td>
-                        <td th:text="${gasEmission.stdEmisnAmnt}"></td>
-                    </tr>
+                    <tbody id="table-body">
                     </tbody>
                 </table>
             </div>
@@ -84,7 +83,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script th:inline="javascript">
-    // Initialize the doughnut chart
     const ctx = document.getElementById('myChart').getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'doughnut',
@@ -105,14 +103,14 @@
                 },
                 title: {
                     display: true,
-                    text: 'Chart.js Doughnut Chart'
+                    text: '시군구별 온실가스 배출량 '
                 }
             },
             onClick: (event, elements) => {
                 if (elements.length > 0) {
                     const index = elements[0].index;
                     const label = myChart.data.labels[index];
-                    fetchDataForYear1(label);
+                    fetchDataForYear1("2019", label);
                 }
             }
         }
@@ -125,7 +123,7 @@
         data: {
             labels: [],
             datasets: [{
-                label: 'Selected Data',
+                label: '온실가스 배출량',
                 data: [],
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
@@ -157,13 +155,14 @@
         });
     }
 
-    function fetchDataForYear1(year) {
+    function fetchDataForYear1(year, adres) {
         $.ajax({
             url: `/api/carbon/corp/dashboard`,
             method: 'GET',
-            data: { year: year },
+            data: { year: year, adres: adres},
             success: function(data) {
-                updateBarChart(data.corpDsgnStatistics);
+                updateBarChart(data.corpEmissionList);
+                updateTable(data.corpEmissionList);
                 $('#selected-year').text(year);
             },
             error: function(error) {
@@ -182,7 +181,7 @@
     }
 
     function updateBarChart(data) {
-        const labels = data.map(item => item.dsgnInds);
+        const labels = data.map(item => item.corpNm);
         const chart_data = data.map(item => item.ghgEms);
 
         barChart.data.labels = labels;
@@ -192,9 +191,25 @@
 
     document.addEventListener('DOMContentLoaded', (event) => {
         fetchDataForYear("2019");
-        fetchDataForYear1("2019");
+        fetchDataForYear1("2019", "포항");
     });
 
+    function updateTable(data) {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.yy}</td>
+                <td>${item.corpNm}</td>
+                <td>${item.dsgnInds}</td>
+                <td>${item.vrfctAgncy}</td>
+                <td>${item.ghgEms} ${item.ghgUnit}</td>
+                <td>${item.adres}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
 </script>
 </body>
 </html>

@@ -9,16 +9,42 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/dashboard.css" rel="stylesheet">
     <style>
+        .chart-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px; /* 바 차트와 나머지 차트 사이의 간격 추가 */
+        }
+
+        canvas {
+            display: block;
+            margin: 10px; /* 차트들 사이에 간격 추가 */
+        }
+
+        #barChart {
+            width: 90%; /* 바 차트의 너비를 90%로 설정하여 전체 너비를 차지하도록 */
+            max-width: 90%;
+            height: 400px; /* 바 차트의 높이를 조정 */
+            margin: 10px auto; /* 가운데 정렬 */
+        }
+
         #myChart {
-            margin-bottom: 50px;
+            width: 60%; /* myChart의 너비를 60%로 설정 */
+            max-width: 60%;
+            height: 300px; /* myChart의 높이를 조정 */
         }
 
-        #title {
-            margin-bottom: 20px;
-        }
-
-        th {
-            text-align: center;
+        #pieChart {
+            width: 30%; /* pieChart의 너비를 30%로 설정 */
+            max-width: 30%;
+            height: 300px; /* pieChart의 높이를 조정 */
         }
     </style>
 </head>
@@ -49,9 +75,13 @@
                     </div>
                 </div>-->
             </div>
-            <canvas id="pieChart" width="900" height="380"></canvas>
-            <canvas id="barChart" width="900" height="380"></canvas>
-            <canvas id="myChart" width="900" height="380"></canvas>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+                <div class="chart-row">
+                    <canvas id="pieChart"></canvas>
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
             <h2 th:text="${title}" id="title"></h2>
             <div class="table-responsive">
                 <table class="table table-striped table-sm table-bordered">
@@ -60,8 +90,6 @@
                         <th scope="col">년도</th>
                         <th scope="col">법인명</th>
                         <th scope="col">검증기관</th>
-                        <th scope="col">에너지 사용량</th>
-                        <th scope="col">에너지 사용량 단위</th>
                         <th scope="col">온실가스 배출량</th>
                         <th scope="col">온실가스 배출량 단위</th>
                     </tr>
@@ -105,7 +133,7 @@
                 },
                 title: {
                     display: true,
-                    text: 'Chart.js Line Chart'
+                    text: '연도별 온실가스 총 배출량'
                 }
             }
         },
@@ -119,7 +147,7 @@
             datasets: [{
                 label: '기준 배출량',
                 data: [],
-                    backgroundColor: Object.values(CHART_COLORS),
+                backgroundColor: Object.values(CHART_COLORS),
                 borderWidth: 1
             }]
         },
@@ -131,20 +159,26 @@
                 },
                 title: {
                     display: true,
-                    text: 'Chart.js Doughnut Chart'
+                    text: '산업별 온실가스 배출량'
+                }
+            },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const label = pieChart.data.labels[index];
+                    fetchDataForYear1("2019", label);
                 }
             }
         }
     });
 
-    // Initialize the bar chart
     const barCtx = document.getElementById('barChart').getContext('2d');
     const barChart = new Chart(barCtx, {
         type: 'bar',
         data: {
             labels: [],
             datasets: [{
-                label: 'Selected Data',
+                label: '온실가스 감축량',
                 data: [],
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
@@ -168,6 +202,21 @@
             data: { year: year },
             success: function(data) {
                 updateChart(data.corpDsgnStatistics, data.ggStatistics);
+                $('#selected-year').text(year);
+            },
+            error: function(error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    function fetchDataForYear1(year, dsgnInds) {
+        $.ajax({
+            url: `/api/carbon/corp/statistics`,
+            method: 'GET',
+            data: { year: year, dsgnInds: dsgnInds},
+            success: function(data) {
+                updateTable(data.corpEmissionList);
                 $('#selected-year').text(year);
             },
             error: function(error) {
@@ -212,8 +261,6 @@
                 <td>${item.yy}</td>
                 <td>${item.corpNm}</td>
                 <td>${item.vrfctAgncy}</td>
-                <td>${item.engChsm}</td>
-                <td>${item.engUnit}</td>
                 <td>${item.ghgEms} ${item.ghgUnit}</td>
                 <td>${item.ghgUnit}</td>
             `;
@@ -223,6 +270,7 @@
 
     document.addEventListener('DOMContentLoaded', (event) => {
         fetchDataForYear("2019");
+        fetchDataForYear1("2019", "건설");
     });
 
 </script>

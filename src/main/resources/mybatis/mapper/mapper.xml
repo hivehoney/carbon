@@ -7,10 +7,16 @@
         select * from gas_emission where yy = #{year};
     </select>
 
-    <select id="selectCorpEmission" parameterType="String" resultType="com.carbon.emissions.domain.EnergyConsumption">
+    <select id="selectCorpEmission" parameterType="java.util.HashMap" resultType="com.carbon.emissions.domain.EnergyConsumption">
         SELECT *
         FROM ENERGY_CONSUMPTION
         WHERE yy = #{year}
+        <if test="adres != null and adres != ''">
+            AND ADRES LIKE CONCAT('%', #{adres}, '%')
+        </if>
+        <if test="dsgnInds != null and dsgnInds != ''">
+            AND dsgn_inds = #{dsgnInds}
+        </if>
         ORDER BY CAST(REPLACE(ghg_ems, ',', '') AS BIGINT) DESC
             LIMIT 100;
     </select>
