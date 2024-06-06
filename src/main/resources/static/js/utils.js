@@ -60,3 +60,7 @@ window.color = color;
 window.CHART_COLORS = CHART_COLORS;
 window.NAMED_COLORS = NAMED_COLORS;
 window.namedColor = namedColor;
+
+function formatNumberWithCommas(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

@@ -87,11 +87,11 @@
                 <table class="table table-striped table-sm table-bordered">
                     <thead>
                     <tr>
-                        <th scope="col">년도</th>
                         <th scope="col">법인명</th>
-                        <th scope="col">검증기관</th>
+                        <th scope="col">산업</th>
+                        <th scope="col">에너지 사용량</th>
                         <th scope="col">온실가스 배출량</th>
-                        <th scope="col">온실가스 배출량 단위</th>
+                        <th scope="col">검증기관</th>
                     </tr>
                     </thead>
                     <tbody id="table-body">
@@ -107,7 +107,7 @@
 <script type="text/javascript" src="/js/utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+<script th:inline="javascript">
     const ctx = document.getElementById('myChart').getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'line',
@@ -201,7 +201,7 @@
             method: 'GET',
             data: { year: year },
             success: function(data) {
-                updateChart(data.corpDsgnStatistics, data.ggStatistics);
+                updateChart(data.corpDsgnStatistics, data.ggStatistics, data.yyStatistics);
                 $('#selected-year').text(year);
             },
             error: function(error) {
@@ -216,7 +216,7 @@
             method: 'GET',
             data: { year: year, dsgnInds: dsgnInds},
             success: function(data) {
-                updateTable(data.corpEmissionList);
+                updateTable(data.selectCorpStatistics);
                 $('#selected-year').text(year);
             },
             error: function(error) {
@@ -225,19 +225,15 @@
         });
     }
 
-    function convertStringArrayToNumberArray(stringArray) {
-        return stringArray.map(value => parseFloat(value.replace(/,/g, '').trim()));
-    }
-
-    function updateChart(data, data1) {
+    function updateChart(data, data1, data2) {
         const labels = data.map(item => item.dsgnInds);
         const chart_data = data.map(item => item.ghgEms);
 
         const labels1 = data1.map(item => item.signNm);
-        const chart_data1 = data1.map(item => item.gasEnisnAmnt);
+        const chart_data1 = data1.map(item => item.gasReductAmnt);
 
-        const labels2 = data1.map(item => item.signNm);
-        const chart_data2 = data1.map(item => item.gasReductAmnt);
+        const labels2 = data2.map(item => item.yy);
+        const chart_data2 = data2.map(item => item.gasEnisnAmnt);
 
         pieChart.data.labels = labels;
         pieChart.data.datasets[0].data = chart_data;
@@ -258,11 +254,11 @@
         data.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.yy}</td>
                 <td>${item.corpNm}</td>
+                <td>${item.dsgnInds}</td>
+                <td>${formatNumberWithCommas(item.engCnsm)} ${item.engUnit}</td>
+                <td>${formatNumberWithCommas(item.ghgEms)} ${item.ghgUnit}</td>
                 <td>${item.vrfctAgncy}</td>
-                <td>${item.ghgEms} ${item.ghgUnit}</td>
-                <td>${item.ghgUnit}</td>
             `;
             tbody.appendChild(row);
         });

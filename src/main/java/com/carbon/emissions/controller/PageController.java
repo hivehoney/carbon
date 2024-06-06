@@ -15,7 +15,6 @@ public class PageController {
 
     @GetMapping("/carbon/dashboard")
     public String getDashBoard(Model model) {
-        model.addAttribute("title", "경기도 온실가스 배출량");
         return "index";
     }
 

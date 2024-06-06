@@ -1,16 +1,3 @@
--- tb_product
-/*CREATE TABLE IF NOT EXISTS `TB_PRODUCT`(
-    id              bigint auto_increment primary key           comment 'id',
-    name            varchar(255) not null                       comment 'product name',
-    description     varchar(255) null                           comment 'product description',
-    status          integer  not null default '0'    comment 'status'
-
-    --record_state    varchar(30)  not null default 'ACTIVE'      comment 'record_state',
-    --price           bigint default 0                            comment 'product price',
-    --created_date    datetime(6) null                            comment 'created date',
-    --updated_date    datetime(6) null                            comment 'updated date'
-    );*/
-
 --경기도 시군별 온실가스 배출량 정보
 CREATE TABLE IF NOT EXISTS `GAS_EMISSION` (
     yy VARCHAR(4) NOT NULL,                -- 년도

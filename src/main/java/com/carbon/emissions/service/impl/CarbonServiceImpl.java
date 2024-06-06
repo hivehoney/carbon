@@ -28,6 +28,11 @@ public class CarbonServiceImpl implements CarbonService {
     }
 
     @Transactional
+    public List<EnergyConsumption> selectCorpStatistics(HashMap<String, Object> params){
+        return carbonRepository.selectCorpStatistics(params);
+    }
+
+    @Transactional
     public List<EnergyConsumption> selectCorpDsgnStatistics(String year){
         return carbonRepository.selectCorpDsgnStatistics(year);
     }
@@ -35,5 +40,10 @@ public class CarbonServiceImpl implements CarbonService {
     @Transactional
     public List<GasEmissionScrap> selectGgStatistics(String year){
         return carbonRepository.selectGgStatistics(year);
+    }
+
+    @Transactional
+    public List<GasEmissionScrap> selectYyStatistics(){
+        return carbonRepository.selectYyStatistics();
     }
 }

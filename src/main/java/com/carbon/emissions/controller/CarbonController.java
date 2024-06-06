@@ -51,6 +51,7 @@ public class CarbonController {
         List<EnergyConsumption> corpEmissionList = carbonService.selectCorpEmission(params);
         Map<String, Object> map = new HashMap<>();
         map.put("corpEmissionList", corpEmissionList);
+
         return map;
     }
 
@@ -63,9 +64,12 @@ public class CarbonController {
     public Map<String, Object> carbonStatistics(@RequestParam(name = "year") String year) throws Exception {
         List<EnergyConsumption> corpDsgnStatistics = carbonService.selectCorpDsgnStatistics(year);
         List<GasEmissionScrap> ggStatistics = carbonService.selectGgStatistics(year);
+        List<GasEmissionScrap> yyStatistics = carbonService.selectYyStatistics();
+
         Map<String, Object> map = new HashMap<>();
         map.put("corpDsgnStatistics", corpDsgnStatistics);
         map.put("ggStatistics", ggStatistics);
+        map.put("yyStatistics", yyStatistics);
         return map;
     }
 
@@ -79,6 +83,7 @@ public class CarbonController {
         List<GasEmissionScrap> ggStatistics = carbonService.selectGgStatistics(year);
         Map<String, Object> map = new HashMap<>();
         map.put("ggStatistics", ggStatistics);
+        map.put("title", ggStatistics.get(0).getSignNm());
         return map;
     }
 
@@ -104,13 +109,12 @@ public class CarbonController {
                                                    @RequestParam(name = "dsgnInds") String dsgnInds) throws Exception {
 
         HashMap<String, Object> params = new HashMap<>();
-        params.put("year", year);
         params.put("dsgnInds", dsgnInds);
 
-        List<EnergyConsumption> corpEmissionList = carbonService.selectCorpEmission(params);
+        List<EnergyConsumption> selectCorpStatistics = carbonService.selectCorpStatistics(params);
 
         Map<String, Object> map = new HashMap<>();
-        map.put("corpEmissionList", corpEmissionList);
+        map.put("selectCorpStatistics", selectCorpStatistics);
 
         return map;
     }

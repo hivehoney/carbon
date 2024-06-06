@@ -42,10 +42,10 @@
                             <span id="selected-year"></span>
                         </button>
                         <ul class="dropdown-menu" id="year-dropdown" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item" href="#" onclick="selectYear(2021)">2021</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="selectYear(2020)">2020</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="selectYear(2019)">2019</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="selectYear(2018)">2018</a></li>
+                            <li><a class="dropdown-item" onclick="selectYear(2021)">2021</a></li>
+                            <li><a class="dropdown-item" onclick="selectYear(2020)">2020</a></li>
+                            <li><a class="dropdown-item" onclick="selectYear(2019)">2019</a></li>
+                            <li><a class="dropdown-item" onclick="selectYear(2018)">2018</a></li>
                         </ul>
                     </div>
                 </div>
@@ -60,6 +60,7 @@
                         <th scope="col">법인명</th>
                         <th scope="col">업종</th>
                         <th scope="col">검증기관</th>
+                        <th scope="col">에너지 사용량</th>
                         <th scope="col">온실가스 배출량</th>
                         <th scope="col">주소</th>
                     </tr>
@@ -74,16 +75,17 @@
 
 <script type="text/javascript" src="/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="/js/utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+<script th:inline="javascript">
     const ctx = document.getElementById('myChart').getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: [],
             datasets: [{
-                label: '기준 배출량',
+                label: '온실가스 배출량',
                 data: [],
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -91,7 +93,7 @@
             }
                 ,
                 {
-                    label: '온실가스 배출량',
+                    label: '에너지 사용량',
                     data: [],
                     backgroundColor: 'rgba(153, 102, 255, 0.2)',
                     borderColor: 'rgba(153, 102, 255, 1)',
@@ -123,18 +125,14 @@
         });
     }
 
-    function convertStringArrayToNumberArray(stringArray) {
-        return stringArray.map(value => parseFloat(value.replace(/,/g, '').trim()));
-    }
-
     function updateChart(data) {
         const labels = data.map(item => item.corpNm);
-        const engChsm = data.map(item => item.engChsm);
+        const engCnsm = data.map(item => item.engCnsm);
         const ghgEms = data.map(item => item.ghgEms);
 
         myChart.data.labels = labels;
-        myChart.data.datasets[0].data = engChsm;
-        myChart.data.datasets[1].data = ghgEms;
+        myChart.data.datasets[0].data = ghgEms;
+        myChart.data.datasets[1].data = engCnsm;
         myChart.update();
     }
 
@@ -148,7 +146,8 @@
                 <td>${item.corpNm}</td>
                 <td>${item.dsgnInds}</td>
                 <td>${item.vrfctAgncy}</td>
-                <td>${item.ghgEms} ${item.ghgUnit}</td>
+                <td>${formatNumberWithCommas(item.engCnsm)} ${item.engUnit}</td>
+                <td>${formatNumberWithCommas(item.ghgEms)} ${item.ghgUnit}</td>
                 <td>${item.adres}</td>
             `;
             tbody.appendChild(row);
@@ -191,7 +190,6 @@
         const firstYear = firstItem ? firstItem.textContent.trim() : 'Select Year';
         selectYear(firstYear);
     });
-
 </script>
 </body>
 </html>

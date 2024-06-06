@@ -4,7 +4,10 @@
 
 <mapper namespace="com.carbon.emissions.repository.CarbonRepository">
     <select id="selectGasEmission" parameterType="String" resultType="com.carbon.emissions.domain.GasEmissionScrap">
-        select * from gas_emission where yy = #{year};
+        select *
+        from gas_emission
+        where yy = #{year}
+        order by gas_enisn_amnt DESC, gas_reduct_amnt desc;
     </select>
 
     <select id="selectCorpEmission" parameterType="java.util.HashMap" resultType="com.carbon.emissions.domain.EnergyConsumption">
@@ -18,25 +21,60 @@
             AND dsgn_inds = #{dsgnInds}
         </if>
         ORDER BY CAST(REPLACE(ghg_ems, ',', '') AS BIGINT) DESC
-            LIMIT 100;
+            LIMIT 20;
     </select>
 
    <select id="selectCorpDsgnStatistics" parameterType="String" resultType="com.carbon.emissions.domain.EnergyConsumption">
-       SELECT yy, dsgn_inds, SUM(CAST(REPLACE(ghg_ems, ',', '') AS BIGINT)) AS ghg_ems
-       FROM ENERGY_CONSUMPTION
-       GROUP BY yy, dsgn_inds
-           LIMIT 10
-    </select>
+       SELECT CASE WHEN ranking <![CDATA[<=]]> 10 THEN dsgn_inds ELSE 'etc' END AS dsgn_inds,
+       SUM(ghg_ems) AS ghg_ems
+       FROM
+           (SELECT dsgn_inds, ghg_ems, Rank()
+               over (ORDER BY ghg_ems DESC) AS ranking
+       FROM (SELECT dsgn_inds, SUM(ghg_ems) AS ghg_ems
+       FROM energy_consumption
+       GROUP BY dsgn_inds) AS subquery) AS ranked
+       GROUP BY CASE
+       WHEN ranking <![CDATA[<=]]> 10 THEN dsgn_inds
+       ELSE 'etc' END
+       ORDER BY ghg_ems DESC;
+   </select>
 
     <select id="selectGgStatistics" parameterType="String" resultType="com.carbon.emissions.domain.GasEmissionScrap">
-        SELECT yy, sign_nm, SUM(gas_enisn_amnt) AS gas_enisn_amnt, SUM(gas_reduct_amnt) AS gas_reduct_amnt
+        SELECT
+            sign_nm
+             , SUM(gas_enisn_amnt) AS gas_enisn_amnt
+             , SUM(gas_reduct_amnt) AS gas_reduct_amnt
         FROM GAS_EMISSION
-        GROUP BY yy, sign_nm LIMIT 20
+        GROUP BY sign_nm
+        order by gas_reduct_amnt DESC
     </select>
 
-    <select id="findById" resultType="ProductVo">
-        select * from TB_PRO
-            DUCT where id = #{id};
+    <select id="selectCorpStatistics" parameterType="java.util.HashMap" resultType="com.carbon.emissions.domain.EnergyConsumption">
+        SELECT
+            corp_nm
+             , vrfct_agncy
+             , dsgn_inds
+             , SUM(ghg_ems) AS ghg_ems
+             , ghg_unit
+             , SUM(eng_cnsm) AS eng_cnsm
+             , eng_unit
+        FROM energy_consumption
+        WHERE 1 = 1
+        <if test="dsgnInds != null and dsgnInds != ''">
+            AND dsgn_inds = #{dsgnInds}
+        </if>
+        GROUP BY corp_nm, vrfct_agncy
+        order by ghg_ems DESC
+    </select>
+
+    <select id="selectYyStatistics" resultType="com.carbon.emissions.domain.GasEmissionScrap">
+        SELECT
+            yy
+             , SUM(gas_enisn_amnt) AS gas_enisn_amnt
+             , SUM(gas_reduct_amnt) AS gas_reduct_amnt
+        FROM GAS_EMISSION
+        GROUP BY yy
+        order by YY desc;
     </select>
 
     <insert id="upsertGasEmission" parameterType="list">
@@ -93,36 +131,4 @@
         VALUES (source.yy, source.corp_nm, source.adres, source.dsgn_inds, source.tst, source.vrfct_agncy,
             source.eng_cnsm, source.eng_unit, source.ghg_ems, source.ghg_unit, source.dprtm_chrg, source.dsgn_clsf);
     </insert>
-    <!--
-        <insert id="save" parameterType="ProductVo">
-            INSERT INTO TB_PRODUCT (
-                name,
-                description,
-                status,
-            )
-            VALUES (
-                       #{name},
-                       #{description},
-                       #{status},
-                   )
-        </insert>
-
-       &lt;!&ndash; <update id="update" parameterType="io.home.test.app.product.domain.Product">
-            UPDATE
-            TB_PRODUCT
-            SET
-            <if test="name!=null">name=#{name}</if>
-            <if test="description!=null">,description=#{description}</if>
-            <if test="price!=null">,price=#{price}</if>
-            <if test="recordState!=null">,record_state=#{recordState}</if>
-            <if test="status!=null">,status=#{status}</if>
-            <if test="createdDate!=null">,created_date=#{createdDate}</if>
-            <if test="updatedDate!=null">,updated_date=#{updatedDate}</if>
-            WHERE
-            id=#{id};
-        </update>&ndash;&gt;
-
-        <delete id="deleteById">
-            delete from TB_PRODUCT where id = #{id};
-        </delete>-->
 </mapper>

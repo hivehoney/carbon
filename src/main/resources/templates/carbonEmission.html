@@ -60,9 +60,9 @@
                         <th scope="col">시군</th>
                         <th scope="col">기준 배출량</th>
                         <th scope="col">온실가스 배출량</th>
+                        <th scope="col">온실가스 감축량</th>
                         <th scope="col">외부 감축사업 감축량</th>
                         <th scope="col">탄소포인트 감축량</th>
-                        <th scope="col">온실가스 감축량</th>
                         <th scope="col">온실가스 감축률(%)</th>
                     </tr>
                     </thead>
@@ -76,9 +76,10 @@
 
 <script type="text/javascript" src="/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="/js/utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+<script th:inline="javascript">
     const ctx = document.getElementById('myChart').getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'bar',
@@ -144,11 +145,11 @@
             row.innerHTML = `
                 <td>${item.yy}</td>
                 <td>${item.signNm}</td>
-                <td>${item.stdEmisnAmnt}</td>
-                <td>${item.gasEnisnAmnt}</td>
-                <td>${item.reductBizReductAmnt}</td>
-                <td>${item.crbnReductAmnt}</td>
-                <td>${item.gasReductAmnt}</td>
+                <td>${formatNumberWithCommas(item.stdEmisnAmnt)}</td>
+                <td>${formatNumberWithCommas(item.gasEnisnAmnt)}</td>
+                 <td>${formatNumberWithCommas(item.gasReductAmnt)}</td>
+                <td>${formatNumberWithCommas(item.reductBizReductAmnt)}</td>
+                <td>${formatNumberWithCommas(item.crbnReductAmnt)}</td>
                 <td>${item.gasReductRt}%</td>
             `;
             tbody.appendChild(row);

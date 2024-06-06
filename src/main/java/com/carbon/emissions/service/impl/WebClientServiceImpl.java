@@ -26,7 +26,6 @@ public class WebClientServiceImpl implements WebClientService {
     public List<Map<String, Object>> getScrapData() throws JsonProcessingException {
 
         String response = webClient.post()
-//                .uri("https://openapi.gg.go.kr/GGSIGUNGREENGASEMSTM?Type=json")
                 .uri("https://openapi.gg.go.kr/GGSIGUNGREENGASEMSTM?Type=json&KEY=0451acb05727406da82e8ef6518b7aae")
                 .contentType(MediaType.TEXT_HTML)
                 .retrieve()

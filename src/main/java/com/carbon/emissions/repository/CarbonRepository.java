@@ -11,9 +11,10 @@ import java.util.List;
 public interface CarbonRepository {
     List<GasEmissionScrap> selectGasEmission(String year);
     List<EnergyConsumption> selectCorpEmission(HashMap<String, Object> params);
-
+    List<EnergyConsumption> selectCorpStatistics(HashMap<String, Object> params);
     List<EnergyConsumption> selectCorpDsgnStatistics(String year);
     List<GasEmissionScrap> selectGgStatistics(String year);
+    List<GasEmissionScrap> selectYyStatistics();
 
     void upsertGasEmission(List<GasEmissionScrap> gas);
 
