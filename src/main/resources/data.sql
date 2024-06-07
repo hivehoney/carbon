@@ -26,6 +26,5 @@ CREATE TABLE IF NOT EXISTS ENERGY_CONSUMPTION (
     dprtm_chrg VARCHAR(20),           -- 소관부처
     dsgn_clsf VARCHAR(10),            -- 지정구분
     PRIMARY KEY (yy, corp_nm),         -- 대상연도와 법인명을 키로 설정
-    PRIMARY KEY (yy, corp_nm),
     CONSTRAINT fk_energy_consumption_yy FOREIGN KEY (yy) REFERENCES GAS_EMISSION(yy)
 );
