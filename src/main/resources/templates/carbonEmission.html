@@ -178,8 +178,32 @@
     }
 
     function downloadExcel() {
-        const year = $('#selected-year').text().trim();
-        fetchDataForYear(year);
+        const year = document.getElementById('selected-year').textContent;
+        excelDown(year);
+    }
+
+    function excelDown(year) {
+        $.ajax({
+            url: `/api/carbon/excel`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ year: year, gubun: "sigun" }),
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function(blob) {
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = year+"_지역별_온실가스_배출_세부내용.xlsx";
+                link.click();
+            },
+            error: function(xhr, status, error) {
+                console.error('서버 응답:', xhr);
+                console.error('오류 상태:', status);
+                console.error('오류 메시지:', error);
+                alert('엑셀 다운로드에 실패했습니다.');
+            }
+        });
     }
 
     function selectYear(year) {
@@ -192,7 +216,6 @@
         const firstYear = firstItem ? firstItem.textContent.trim() : 'Select Year';
         selectYear(firstYear);
     });
-
 </script>
 </body>
 </html>

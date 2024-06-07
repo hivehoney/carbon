@@ -178,21 +178,23 @@
     function excelDown(year) {
         $.ajax({
             url: `/api/carbon/excel`,
-            method: 'GET',
-            data: { year: year, gubun: "dashboard" },
-            success: function(data, textStatus, xhr) {
-                if (xhr.status === 200) {
-                    alert('최신 데이터로 연동되었습니다.');
-                } else {
-                    alert('Bad Gateway: Failed to scrape data');
-                }
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ year: year, gubun: "corp" }),
+            xhrFields: {
+                responseType: 'blob'
             },
-            error: function(xhr, textStatus, errorThrown) {
-                if (xhr.status === 502) {
-                    alert('Bad Gateway: Failed to scrape data');
-                } else {
-                    alert('An error occurred: ' + xhr.status);
-                }
+            success: function(blob) {
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = year+"_사업장_온실가스_배출_세부내용.xlsx";
+                    link.click();
+            },
+            error: function(xhr, status, error) {
+                console.error('서버 응답:', xhr);
+                console.error('오류 상태:', status);
+                console.error('오류 메시지:', error);
+                alert('엑셀 다운로드에 실패했습니다.');
             }
         });
     }

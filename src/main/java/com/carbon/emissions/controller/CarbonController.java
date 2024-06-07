@@ -3,25 +3,19 @@ package com.carbon.emissions.controller;
 import com.carbon.emissions.domain.EnergyConsumption;
 import com.carbon.emissions.domain.GasEmissionScrap;
 import com.carbon.emissions.domain.excel.EnergyConsumptionDto;
+import com.carbon.emissions.domain.excel.GasEmissionScrapDto;
 import com.carbon.emissions.service.CarbonService;
 import com.carbon.emissions.service.ScrapService;
 import com.carbon.emissions.util.ExcelUtil;
-import io.netty.util.internal.StringUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,24 +125,32 @@ public class CarbonController {
     }
 
     @ResponseBody
-    @GetMapping(value = "/excel")
-    public void excelExport(HttpServletResponse response, @RequestParam(name = "gubun") String gubun) throws IOException {
-        if (gubun.equals("dashboard")) {
-            HashMap<String, Object> params = new HashMap<>();
-//            params.put("adres", adres);
-            params.put("year", "2018");
+    @PostMapping(value = "/excel")
+    public void excelExport(HttpServletResponse response, @RequestBody HashMap<String, Object> params) throws IOException {
+        String gubun = (String) params.get("gubun");
 
+        if (gubun.equals("corp") || gubun.equals("dashboard")) {
             List<EnergyConsumption> corpEmissionList = carbonService.selectCorpEmission(params);
             List<EnergyConsumptionDto> corpEmissionExcel = corpEmissionList.stream()
                     .map(val -> EnergyConsumptionDto.of(val)).collect(Collectors.toList());
 
-            // 엑셀 다운로드 로직 실행
+            // Generate Excel file
             ByteArrayOutputStream excelFile = excelUtil.generateExcel(corpEmissionExcel, EnergyConsumptionDto.class);
-            // Set response headers
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=EnergyConsumption.xlsx");
 
-            // Write the file to the response
+            // Write Excel file to response
+            response.getOutputStream().write(excelFile.toByteArray());
+            response.getOutputStream().flush();
+        } else if (gubun.equals("sigun")) {
+            String year = (String) params.get("year");
+            List<GasEmissionScrap> gasEmissionList = carbonService.selectGasEmission(year);
+
+                List<GasEmissionScrapDto> gasEmissionExcel = gasEmissionList.stream()
+                    .map(val -> GasEmissionScrapDto.of(val)).collect(Collectors.toList());
+
+            // Generate Excel file
+            ByteArrayOutputStream excelFile = excelUtil.generateExcel(gasEmissionExcel, GasEmissionScrapDto.class);
+
+            // Write Excel file to response
             response.getOutputStream().write(excelFile.toByteArray());
             response.getOutputStream().flush();
         }
