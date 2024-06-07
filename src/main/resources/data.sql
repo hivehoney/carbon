@@ -8,8 +8,7 @@ CREATE TABLE IF NOT EXISTS `GAS_EMISSION` (
     reduct_biz_reduct_amnt INT,            -- 외부감축사업감축량(tonCO2-eq)
     gas_reduct_rt DECIMAL(10, 2),          -- 온실가스감축률(%)
     std_emisn_amnt INT,                    -- 기준배출량(tonCO2-eq)
-    PRIMARY KEY (yy, sign_nm),  -- 중복을 방지하기 위해 UNIQUE 제약조건을 설정합니다.
-    UNIQUE (yy)
+    PRIMARY KEY (yy, sign_nm)  -- 중복을 방지하기 위해 UNIQUE 제약조건을 설정합니다.
 );
 
 --사업장별 온실가스 배출량∙에너지 사용량 정보
