@@ -24,7 +24,7 @@
             LIMIT 20;
     </select>
 
-   <select id="selectCorpDsgnStatistics" parameterType="String" resultType="com.carbon.emissions.domain.EnergyConsumption">
+   <select id="selectCorpDsgnStatistics" resultType="com.carbon.emissions.domain.EnergyConsumption">
        SELECT CASE WHEN ranking <![CDATA[<=]]> 10 THEN dsgn_inds ELSE 'etc' END AS dsgn_inds,
        SUM(ghg_ems) AS ghg_ems
        FROM
@@ -39,7 +39,7 @@
        ORDER BY ghg_ems DESC;
    </select>
 
-    <select id="selectGgStatistics" parameterType="String" resultType="com.carbon.emissions.domain.GasEmissionScrap">
+    <select id="selectGgStatistics" resultType="com.carbon.emissions.domain.GasEmissionScrap">
         SELECT
             sign_nm
              , SUM(gas_enisn_amnt) AS gas_enisn_amnt
@@ -47,6 +47,18 @@
         FROM GAS_EMISSION
         GROUP BY sign_nm
         order by gas_reduct_amnt DESC
+    </select>
+
+    <select id="selectSigunStatistics" parameterType="String" resultType="com.carbon.emissions.domain.GasEmissionScrap">
+        SELECT
+          YY
+            , sign_nm
+             , SUM(gas_enisn_amnt) AS gas_enisn_amnt
+             , SUM(gas_reduct_amnt) AS gas_reduct_amnt
+        FROM GAS_EMISSION
+        WHERE YY = #{YY}
+        GROUP BY YY, sign_nm
+        order by gas_enisn_amnt DESC
     </select>
 
     <select id="selectCorpStatistics" parameterType="java.util.HashMap" resultType="com.carbon.emissions.domain.EnergyConsumption">

@@ -56,7 +56,7 @@ public class WebClientServiceImpl implements WebClientService {
 //                .bodyToMono(String.class).block();
 
         List<String> responses = new ArrayList<>();
-        for (int start = 28; start <= 73; start++) {
+        for (int start = 1; start <= 73; start++) {
             int finalStart = start;
             String response = webClient.post()
                     .uri(uriBuilder -> uriBuilder

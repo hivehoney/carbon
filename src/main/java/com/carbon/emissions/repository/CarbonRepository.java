@@ -10,10 +10,11 @@ import java.util.List;
 @Mapper
 public interface CarbonRepository {
     List<GasEmissionScrap> selectGasEmission(String year);
+    List<GasEmissionScrap> selectSigunStatistics(String year);
     List<EnergyConsumption> selectCorpEmission(HashMap<String, Object> params);
     List<EnergyConsumption> selectCorpStatistics(HashMap<String, Object> params);
-    List<EnergyConsumption> selectCorpDsgnStatistics(String year);
-    List<GasEmissionScrap> selectGgStatistics(String year);
+    List<EnergyConsumption> selectCorpDsgnStatistics();
+    List<GasEmissionScrap> selectGgStatistics();
     List<GasEmissionScrap> selectYyStatistics();
 
     void upsertGasEmission(List<GasEmissionScrap> gas);

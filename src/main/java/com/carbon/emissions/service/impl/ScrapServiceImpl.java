@@ -2,20 +2,15 @@ package com.carbon.emissions.service.impl;
 
 import com.carbon.emissions.domain.EnergyConsumption;
 import com.carbon.emissions.domain.GasEmissionScrap;
-import com.carbon.emissions.domain.ProductVo;
 import com.carbon.emissions.repository.CarbonRepository;
-import com.carbon.emissions.service.CarbonService;
 import com.carbon.emissions.service.ScrapService;
 import com.carbon.emissions.service.WebClientService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
