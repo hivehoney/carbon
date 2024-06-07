@@ -9,6 +9,7 @@ import java.util.List;
 public interface CarbonService {
     List<GasEmissionScrap> selectGasEmission(String year);
     List<GasEmissionScrap> selectSigunStatistics(String year);
+    void carbonDataClear();
     List<EnergyConsumption> selectCorpEmission(HashMap<String, Object> params);
     List<EnergyConsumption> selectCorpDsgnStatistics();
     List<EnergyConsumption> selectCorpStatistics(HashMap<String, Object> params);

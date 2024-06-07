@@ -94,6 +94,12 @@ public class CarbonController {
     }
 
     @ResponseBody
+    @GetMapping(value = "/data/clear")
+    public void carbonDataClear() throws Exception {
+        carbonService.carbonDataClear();
+    }
+
+    @ResponseBody
     @GetMapping(value = "/corp/dashboard")
     public Map<String, Object> carbonCorpDashboard(@RequestParam(name = "year") String year,
                                                    @RequestParam(name = "adres") String adres) throws Exception {

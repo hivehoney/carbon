@@ -27,6 +27,12 @@ public class CarbonServiceImpl implements CarbonService {
     }
 
     @Transactional
+    public void carbonDataClear() {
+        carbonRepository.deleteGasEmission();
+        carbonRepository.deleteCorpEmission();
+    }
+
+    @Transactional
     public List<EnergyConsumption> selectCorpEmission(HashMap<String, Object> params){
         return carbonRepository.selectCorpEmission(params);
     }

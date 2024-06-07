@@ -10,6 +10,13 @@
         order by gas_enisn_amnt DESC, gas_reduct_amnt desc;
     </select>
 
+    <delete id="deleteGasEmission">
+        delete from ENERGY_CONSUMPTION  where yy = '2016' OR yy = '2017' OR yy = '2022'
+    </delete>
+    <delete id="deleteCorpEmission">
+        DELETE FROM ENERGY_CONSUMPTION WHERE ADRES NOT LIKE CONCAT('%', '경기도', '%')
+    </delete>
+
     <select id="selectCorpEmission" parameterType="java.util.HashMap" resultType="com.carbon.emissions.domain.EnergyConsumption">
         SELECT *
         FROM ENERGY_CONSUMPTION
@@ -83,7 +90,7 @@
         SELECT
             yy
              , SUM(gas_enisn_amnt) AS gas_enisn_amnt
-             , SUM(gas_reduct_amnt) AS gas_reduct_amnt
+             , SUM(std_emisn_amnt) AS std_emisn_amnt
         FROM GAS_EMISSION
         GROUP BY yy
         order by YY desc;

@@ -57,7 +57,7 @@
         <div th:replace="sidebar :: sidebar"></div>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">경기도 온실가스 배출량</h1>
+                <h1 class="h2">경기도 온실가스 통계</h1>
             </div>
             <div class="chart-container">
                 <canvas id="barChart"></canvas>
@@ -101,13 +101,11 @@
                 label: '기준 배출량',
                 data: [],
                 borderWidth: 1
-            }
-                ,
-                {
-                    label: '온실가스 배출량',
-                    data: [],
-                    borderWidth: 1
-                }]
+            },{
+                label: '온실가스 배출량',
+                data: [],
+                borderWidth: 1
+            }]
         },
         options: {
             responsive: false,
@@ -216,7 +214,8 @@
         const chart_data1 = data1.map(item => item.gasReductAmnt);
 
         const labels2 = data2.map(item => item.yy);
-        const chart_data2 = data2.map(item => item.gasEnisnAmnt);
+        const chart_data2 = data2.map(item => item.stdEmisnAmnt);
+        const chart_data3 = data2.map(item => item.gasEnisnAmnt);
 
         pieChart.data.labels = labels;
         pieChart.data.datasets[0].data = chart_data;
@@ -228,6 +227,7 @@
 
         myChart.data.labels = labels2;
         myChart.data.datasets[0].data = chart_data2;
+        myChart.data.datasets[1].data = chart_data3;
         myChart.update();
     }
 

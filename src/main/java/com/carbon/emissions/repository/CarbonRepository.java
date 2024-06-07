@@ -17,6 +17,9 @@ public interface CarbonRepository {
     List<GasEmissionScrap> selectGgStatistics();
     List<GasEmissionScrap> selectYyStatistics();
 
+    void deleteCorpEmission();
+    void deleteGasEmission();
+
     void upsertGasEmission(List<GasEmissionScrap> gas);
 
     void upsertCorpEmission(List<EnergyConsumption> corp);
